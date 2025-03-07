@@ -1,15 +1,10 @@
 name: Step 1, Open a pull request
 
-# This step listens for the learner to open a pull request with branch `update-game` 
-# and for the creation of a project.
+# This step listens for the creation of a project.
 # This workflow updates from step 1 to step 2.
 
 on:
   workflow_dispatch:
-  pull_request:
-    types:
-      - opened
-      - reopened
   project:
     types: [created]
 
@@ -29,37 +24,12 @@ jobs:
     outputs:
       current_step: ${{ steps.get_step.outputs.current_step }}
 
-  on_open_a_pull_request:
-    name: On open a pull request
-    needs: get_current_step
-    if: >-
-      ${{ !github.event.repository.is_template
-          && needs.get_current_step.outputs.current_step == 1
-          && github.head_ref == 'update-game' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: update-game
-
-      - name: Update to step 2
-        uses: skills/action-update-step@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          from_step: 1
-          to_step: 2
-          branch_name: update-game
-
   on_project_created:
     name: On project created
     needs: get_current_step
     if: >-
       ${{ !github.event.repository.is_template
-          && needs.get_current_step.outputs.current_step == 1
-          && github.event.project.name == 'Kanban' }}
+          && needs.get_current_step.outputs.current_step == 1 }}
     runs-on: ubuntu-latest
 
     steps:
